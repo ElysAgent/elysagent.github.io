@@ -83,7 +83,7 @@ body {
   text-transform: uppercase; color: var(--cyan); margin-bottom: 18px;
 }
 h1 {
-  font-size: clamp(3rem, 10vw, 5.6rem); font-weight: 700; line-height: 1.02;
+  font-size: clamp(2.75rem, 11vw, 5.6rem); font-weight: 700; line-height: 1.02;
   letter-spacing: -0.03em;
 }
 h1 .grad {
@@ -115,7 +115,13 @@ h1 .grad {
 .teaser:nth-child(1) { animation-delay: 0.55s; }
 .teaser:nth-child(2) { animation-delay: 0.68s; }
 .teaser:nth-child(3) { animation-delay: 0.81s; }
-.teaser:hover { transform: translateY(-3px); border-color: rgba(103, 232, 249, 0.35); box-shadow: 0 12px 32px rgba(34, 211, 238, 0.12); }
+/* hover lift is a desktop-only enhancement — touch has no hover */
+@media (hover: hover) {
+  .teaser:hover { transform: translateY(-3px); border-color: rgba(103, 232, 249, 0.35); box-shadow: 0 12px 32px rgba(34, 211, 238, 0.12); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 34px rgba(34, 211, 238, 0.38); }
+  .btn-ghost:hover { border-color: rgba(103, 232, 249, 0.45); transform: translateY(-2px); }
+  footer a:hover { color: var(--cyan); }
+}
 .teaser-num { font-family: var(--mono); font-size: 0.72rem; color: var(--cyan); letter-spacing: 0.12em; }
 .teaser h2 { font-size: 1.02rem; margin: 10px 0 6px; letter-spacing: -0.01em; }
 .teaser p { font-size: 0.9rem; line-height: 1.55; color: var(--muted); }
@@ -146,7 +152,9 @@ h1 .grad {
 .cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 36px; }
 .btn {
   display: inline-block; text-decoration: none; font-weight: 600; font-size: 0.95rem;
-  padding: 13px 24px; border-radius: 999px; transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  padding: 14px 26px; border-radius: 999px; min-height: 48px; line-height: 1.25;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 .btn-primary {
   color: #04121a;
@@ -154,11 +162,9 @@ h1 .grad {
   box-shadow: 0 8px 28px rgba(34, 211, 238, 0.28);
   position: relative; overflow: hidden;
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 34px rgba(34, 211, 238, 0.38); }
 .btn-ghost {
   color: var(--text); border: 1px solid var(--card-border); background: rgba(255, 255, 255, 0.03);
 }
-.btn-ghost:hover { border-color: rgba(103, 232, 249, 0.45); transform: translateY(-2px); }
 
 .fineprint { margin-top: 22px; font-size: 0.82rem; color: var(--muted); font-family: var(--mono); }
 
@@ -167,13 +173,18 @@ footer {
   display: flex; align-items: center; justify-content: center; gap: 10px;
   padding: 22px 20px 28px; font-size: 0.85rem; color: var(--muted); flex-wrap: wrap;
 }
-footer a { color: var(--muted); text-decoration: none; }
-footer a:hover { color: var(--cyan); }
+footer a { color: var(--muted); text-decoration: none; display: inline-block; padding: 14px 8px; }
 .footer-sep { opacity: 0.5; }
 
 @media (max-width: 640px) {
   .teasers { grid-template-columns: 1fr; }
-  .status { display: none; }
+  /* status pill stays visible on phones — compact, with its pulsing dot */
+  .status { font-size: 0.66rem; padding: 6px 10px; gap: 6px; letter-spacing: 0.05em; }
+  /* thicker blinking cursor so it reads on a small screen */
+  .cursor { width: 3px; }
+  /* buttons stack full-width on phones for easy tapping */
+  .cta { flex-direction: column; align-items: stretch; }
+  .btn { text-align: center; }
 }
 
 /* ---- animations (CSS-only, lightweight) ---- */
@@ -191,7 +202,25 @@ footer a:hover { color: var(--cyan); }
 }
 @keyframes coming-glow {
   0%, 100% { text-shadow: 0 0 0 rgba(103, 232, 249, 0); }
-  50% { text-shadow: 0 0 22px rgba(103, 232, 249, 0.38); }
+  50% { text-shadow: 0 0 26px rgba(103, 232, 249, 0.48); }
+}
+/* wider drift for small screens — movement must read against a small orb */
+@keyframes drift-a-m {
+  0%, 100% { transform: translateX(-50%) translate(0, 0); }
+  50% { transform: translateX(-50%) translate(56px, 40px); }
+}
+@keyframes drift-b-m {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-48px, -52px); }
+}
+/* soft glow breathing on the primary CTA — touch devices get a pulse
+   instead of a hover lift */
+@keyframes cta-glow {
+  0%, 100% { box-shadow: 0 8px 28px rgba(34, 211, 238, 0.28); }
+  50% { box-shadow: 0 8px 36px rgba(34, 211, 238, 0.55); }
+}
+@media (hover: none) {
+  .btn-primary { animation: cta-glow 3s ease-in-out infinite; }
 }
 @keyframes blink {
   0%, 100% { opacity: 1; }
@@ -236,4 +265,16 @@ footer { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) 1.25s backwards; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .btn-primary::after { display: none; }
+}
+
+/* ---- mobile orb overrides (must come AFTER the base orb animation
+   rules above, same specificity, so source order wins) ---- */
+@media (max-width: 640px) {
+  /* orbs: smaller, mostly ON-screen, stronger and visibly drifting */
+  .orb-a { width: 300px; height: 300px; top: -90px; opacity: 0.7; filter: blur(55px);
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.5), transparent 65%);
+    animation: drift-a-m 22s ease-in-out infinite; }
+  .orb-b { width: 260px; height: 260px; bottom: -70px; right: -40px; opacity: 0.65; filter: blur(55px);
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.42), transparent 65%);
+    animation: drift-b-m 26s ease-in-out infinite; }
 }
